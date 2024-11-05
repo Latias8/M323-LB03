@@ -103,5 +103,29 @@ def save_fun():
     return str(funcs)
 
 
+@app.route('/pf/closure', methods=['GET'])
+def closure():
+    def outer_function(x):
+        def inner_function(y):
+            return x + y
+
+        return inner_function
+
+    add_five = outer_function(5)
+    return str(add_five(3))
+
+
+@app.route('/pf/lambda', methods=['GET'])
+def lambda_():
+    greet = lambda: "Hello, World!"
+    return str(greet())
+
+
+@app.route('/pf/lambdawa', methods=['GET'])
+def lambdawa_():
+    square = lambda x: x**2
+    return str(square(2))
+
+
 if __name__ == '__main__':
     app.run(debug=True)
