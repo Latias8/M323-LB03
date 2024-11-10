@@ -1,4 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
+from functools import reduce
 
 app = Flask(__name__)
 
@@ -125,6 +126,93 @@ def lambda_():
 def lambdawa_():
     square = lambda x: x**2
     return str(square(2))
+
+
+@app.route('/pf/map', methods=['GET'])
+def map_func():
+    def square(x):
+        return x ** 2
+
+    squares = map(square, [1, 2, 3, 4])
+    return list(squares)
+
+
+@app.route('/pf/filter', methods=['GET'])
+def filter_func():
+    def is_even(x):
+        return x % 2 == 0
+
+    even_numbers = filter(is_even, [1, 2, 3, 4, 5])
+    return list(even_numbers)
+
+
+@app.route('/pf/reduce', methods=['GET'])
+def reduce_func():
+    def multiply(x, y):
+        return x * y
+
+    numbers = [1, 2, 3, 4]
+    product_of_numbers = reduce(multiply, numbers)
+    return str(product_of_numbers)
+
+
+@app.route('/pf/mapfilred', methods=['GET'])
+def mapfilred():
+    products = [
+        {"name": "Laptop", "price": 1200},
+        {"name": "Smartphone", "price": 700},
+        {"name": "Tablet", "price": 300},
+        {"name": "Monitor", "price": 450},
+        {"name": "Keyboard", "price": 50}
+    ]
+
+    expensive_products = filter(lambda product: product["price"] > 400, products)
+    discounted_products = map(lambda product: {"name": product["name"], "price": product["price"] * 0.8}, expensive_products)
+    total_price = reduce(lambda acc, product: acc + product["price"], discounted_products, 0)
+    return str(total_price)
+
+
+@app.route('/pf/aggregation', methods=['GET'])
+def aggregation():
+    orders = [
+        {"product": "Laptop", "quantity": 2, "unit_price": 1200, "manufacturer": "Us"},
+        {"product": "Smartphone", "quantity": 5, "unit_price": 700, "manufacturer": "Partner A"},
+        {"product": "Tablet", "quantity": 7, "unit_price": 300, "manufacturer": "Us"},
+        {"product": "Monitor", "quantity": 3, "unit_price": 450, "manufacturer": "Partner B"},
+        {"product": "Keyboard", "quantity": 10, "unit_price": 50, "manufacturer": "Us"}
+    ]
+
+    sales_per_product = map(lambda order: {"product": order["product"], "total_sales": order["quantity"] * order["unit_price"], "manufacturer": order["manufacturer"]}, orders)
+    our_products_sales = filter(lambda order: order["manufacturer"] == "Us", sales_per_product)
+    total_sales = reduce(lambda acc, order: acc + order["total_sales"], our_products_sales, 0)
+    return str(total_sales)
+
+
+@app.route('/pf/factorial/<int:n>', methods=['GET'])
+def factorial(n):
+    result = 1
+
+    for i in range(1, n + 1):
+        result *= i
+
+    return str(result)
+
+
+@app.route('/pf/algwithfunc', methods=['GET'])
+def algwithfunc():
+    def square(x):
+        return x ** 2
+
+    def addition(a, b):
+        return a + b
+
+    def sumofem(x, y):
+        sq_x = square(x)
+        sq_y = square(y)
+        return addition(sq_x, sq_y)
+
+    result = sumofem(420, 69)
+    return str(result)
 
 
 if __name__ == '__main__':
